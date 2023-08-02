@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const axios = require('axios');
+const xml2js = require('xml2js');
 const goodreadsApiKey = process.env['goodreadsApiKey'];
 
 app.use(cors());
@@ -12,7 +13,7 @@ const YOUR_DOMAIN = "http://localhost:4242";
 app.listen(4242, () => console.log("Running on port 4242"));
 
 app.get('/books', async (req, res) => {
-  const { 
+  const {
     q,
     page
   } = req.query;
@@ -27,9 +28,22 @@ app.get('/books', async (req, res) => {
       },
     });
 
-    return res.status(200).send(response.data);
+    return res.status(200).send(convertXmlToJson(response.data));
   } catch (error) {
     console.error('Error searching for books:', error.message);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 })
+
+function convertXmlToJson(xmlString) {
+  let jsonObject = null;
+
+  xml2js.parseString(xmlString, (err, result) => {
+    if (err) {
+      throw err;
+    }
+    jsonObject = result;
+  });
+
+  return jsonObject;
+}
