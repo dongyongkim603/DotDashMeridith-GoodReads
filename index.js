@@ -4,10 +4,6 @@ const app = express();
 const axios = require('axios');
 const goodreadsApiKey = process.env['goodreadsApiKey'];
 
-// const headers = {
-//   'Authorization': `Bearer ${goodreadsApiKey}`
-// };
-
 app.use(cors());
 
 app.use(express.static("."));
@@ -15,13 +11,11 @@ const YOUR_DOMAIN = "http://localhost:4242";
 
 app.listen(4242, () => console.log("Running on port 4242"));
 
-app.get('/test', (req, res) => {
-  console.log("hello world")
-  return res.status(200).json({ status: 200 })
-})
-
 app.get('/books', async (req, res) => {
-  const { q, page } = req.query;
+  const { 
+    q,
+    page
+  } = req.query;
 
   try {
     const apiUrl = 'https://www.goodreads.com/search/index.xml';
