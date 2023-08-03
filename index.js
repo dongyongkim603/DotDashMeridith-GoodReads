@@ -13,22 +13,21 @@ const YOUR_DOMAIN = "http://localhost:4242";
 app.listen(4242, () => console.log("Running on port 4242"));
 
 app.get('/books', async (req, res) => {
-  const {
-    q,
-    page
-  } = req.query;
-
+  const { q, field } = req.query;
   try {
     const apiUrl = 'https://www.goodreads.com/search/index.xml';
     const response = await axios.get(apiUrl, {
       params: {
         q,
         key: goodreadsApiKey,
-        'search[field]': 'all',
+        'search[field]': field,
       },
     });
-
-    return res.status(200).send(convertXmlToJson(response.data));
+    const responseJSON = convertXmlToJson(response.data);
+    const results = responseJSON?.GoodreadsResponse?.search[0]?.results[0]?.work;
+    
+    return res.status(200)
+      .send(results);
   } catch (error) {
     console.error('Error searching for books:', error.message);
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -37,13 +36,11 @@ app.get('/books', async (req, res) => {
 
 function convertXmlToJson(xmlString) {
   let jsonObject = null;
-
   xml2js.parseString(xmlString, (err, result) => {
     if (err) {
       throw err;
     }
     jsonObject = result;
   });
-
   return jsonObject;
 }
