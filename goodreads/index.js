@@ -23,6 +23,9 @@ async function searchBooks(req, res) {
     const responseJSON = convertXmlToJson(response.data);
     let results = responseJSON?.GoodreadsResponse?.search[0]?.results[0]?.work;
 
+    for(let i = 0; i < results.length; i++) {
+      results[i]['relevance'] = i;
+    }
 
     return res.status(200)
       .send(results);
